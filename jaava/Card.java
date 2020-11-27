@@ -1,3 +1,5 @@
+package jaava;
+
 public class Card {
     //private means data is only available in this class Card
    private Suit mySuit;

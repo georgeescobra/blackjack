@@ -1,3 +1,5 @@
+package jaava;
+
 import java.util.Random;
 
 /**

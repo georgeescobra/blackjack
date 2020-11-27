@@ -1,4 +1,6 @@
-public  class Player {
+package jaava;
+
+public class Player {
     
    
         
