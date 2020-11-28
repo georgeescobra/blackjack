@@ -3,13 +3,14 @@
 #define PLAYER_H
 class Player{
    public:
-        Player(std::string);
-        int getPoints();
+        Player(const std::string);
+        double getPoints();
         std::string getName();
+        Player& operator+=(const double);
+        void operator+(const double);
     private: 
         std::string Name;
-        int points;
-        int setPoints();
+        double money;
 };
 
 

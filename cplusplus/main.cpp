@@ -16,9 +16,15 @@ int main(){
         cin >> Name;
     } 
     while (Name.empty());
+    
     Player newPlayer(Name);
-    // Player *newPlayer = new Player(Name);
-    cout << "New Players Name: " << newPlayer.getName() << endl;
+    
+    // cout << newPlayer.getPoints() << endl;
+    // newPlayer +=  1*20;
+    // cout << newPlayer.getPoints() << endl;
+    
+
+
 
     return 0;
 }
