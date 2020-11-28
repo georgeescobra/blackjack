@@ -2,7 +2,7 @@
 CXX = g++
 CXXFLAGS = -g
 EXECUTE = main
-OBJECTS = player.o main.o
+OBJECTS = player.o deck.o main.o
 
 ${EXECUTE}: ${OBJECTS}
 	${CXX} ${CXXFLAGS} -o ${EXECUTE} ${OBJECTS}
@@ -11,7 +11,8 @@ ${EXECUTE}: ${OBJECTS}
 	${CXX} ${CXXFLAGS} -c $<
 
 player.o: player.cpp player.h
-main.o: main.cpp player.h
+deck.o : deck.cpp deck.h
+main.o: main.cpp player.h deck.h
 
 clean:
 	rm -f ${EXECUTE} ${OBJECTS}
