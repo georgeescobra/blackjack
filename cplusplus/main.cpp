@@ -1,7 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
+#include <sstream>
 #include "player.h"
+
 
 void printIntro();
 
@@ -9,6 +12,21 @@ using namespace std;
 int main(){
     cout << "Welcome to Tsing's BlackJack Table!" << endl;
     printIntro();
+    std::map<std::string, double> config;
+    std::ifstream configFile;
+    configFile.open("config.txt", ios::out);
+    if(configFile.is_open()){
+        string line;
+        string key;
+        double value;
+        while(getline(configFile, line)){
+            std::istringstream parse(line);
+            parse >> key >> value;
+            config[key] = value;
+        }
+    }
+    configFile.close();
+    // for (auto const& table : config) cout << table.first << ": " << table.second << endl;
 
     string Name;
     do{
@@ -16,16 +34,9 @@ int main(){
         cin >> Name;
     } 
     while (Name.empty());
+    Player newPlayer(Name, config["startingMoney"]);
+    // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPlayer.getMoney() << endl;
     
-    Player newPlayer(Name);
-    
-    // cout << newPlayer.getPoints() << endl;
-    // newPlayer +=  1*20;
-    // cout << newPlayer.getPoints() << endl;
-    
-
-
-
     return 0;
 }
 

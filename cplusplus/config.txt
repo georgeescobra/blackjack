@@ -1,0 +1,5 @@
+multiplier 1.5
+numOfDecks  1.0
+startingMoney  500.0
+
+

@@ -1,16 +1,16 @@
 #include "player.h"
 #include <string>
 
-Player::Player(const std::string newName){
+Player::Player(const std::string newName, const double startingMoney){
     Name = newName;
-    money = 500.0;
+    money = startingMoney;
 }
 
 std::string Player::getName(){
     return this->Name;
 }
 
-double Player::getPoints(){
+double Player::getMoney(){
     return this->money;
 }
 
