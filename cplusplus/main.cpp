@@ -1,11 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "player.h"
 
 void printIntro();
 
 using namespace std;
-
 int main(){
     cout << "Welcome to Tsing's BlackJack Table!" << endl;
     printIntro();
@@ -16,6 +16,9 @@ int main(){
         cin >> Name;
     } 
     while (Name.empty());
+    Player newPlayer(Name);
+    // Player *newPlayer = new Player(Name);
+    cout << "New Players Name: " << newPlayer.getName() << endl;
 
     return 0;
 }
