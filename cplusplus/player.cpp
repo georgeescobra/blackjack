@@ -6,11 +6,11 @@ Player::Player(const std::string newName, const double startingMoney){
     money = startingMoney;
 }
 
-std::string Player::getName(){
+std::string Player::getName() const{
     return this->Name;
 }
 
-double Player::getMoney(){
+double Player::getMoney() const{
     return this->money;
 }
 

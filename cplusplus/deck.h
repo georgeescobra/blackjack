@@ -14,8 +14,8 @@ class Deck{
             int value;
         };
         std::vector<card> deck;
-        std::string type[4] {"Hearts", "Spades", "Diamonds", "Clubs"};
-        std::vector<std::pair<std::string, int>> face {
+        const std::string type[4] {"Hearts", "Spades", "Diamonds", "Clubs"};
+        const std::vector<std::pair<std::string, int>> face {
             {"Two", 2},
             {"Three", 3},
             {"Four", 4},
@@ -36,7 +36,7 @@ class Deck{
             int drawCard();
             int drawPair();
             std::string getCardName();
-            int getCardValue();
+            int getCardValue() const;
             void shuffleDeck();
         
 };

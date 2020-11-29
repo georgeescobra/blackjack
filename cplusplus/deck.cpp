@@ -1,6 +1,9 @@
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+#include <time.h>
 #include "deck.h"
+
 
 void Deck::printDeck(){
     for (auto const& p: deck) 
@@ -17,5 +20,15 @@ Deck::Deck(const double numOfDeck){
             }
         }
     }
-    printDeck();
+    // printDeck();
+}
+
+void Deck::shuffleDeck(){
+    int len = deck.size();
+    srand(time(0));
+    for(int i = 0; i < len-1; i++){
+        int randIndex = i + rand() % (len - i);
+        std::swap(deck[randIndex], deck[i]);
+    }
+    // printDeck();
 }

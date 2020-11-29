@@ -28,7 +28,8 @@ int main(){
     Player newPlayer(Name, config["startingMoney"]);
     // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl;
     // for (auto const& table : config) std::cout << table.first << ": " << table.second << std::endl;
-    Deck gameDeck(config["numOfDecks"]);
+    Deck gameDeck(config["numOfDecks"]); // initializes the deck
+    gameDeck.shuffleDeck();
     
     return 0;
 }
