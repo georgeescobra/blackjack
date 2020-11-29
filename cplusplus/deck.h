@@ -13,7 +13,7 @@ class Deck{
             std::string suit;
             int value;
         };
-        std::vector<card> deck{};
+        std::vector<card> deck;
         std::string type[4] {"Hearts", "Spades", "Diamonds", "Clubs"};
         std::vector<std::pair<std::string, int>> face {
             {"Two", 2},
@@ -35,6 +35,9 @@ class Deck{
             Deck(const double);
             int drawCard();
             int drawPair();
+            std::string getCardName();
+            int getCardValue();
+            void shuffleDeck();
         
 };
  

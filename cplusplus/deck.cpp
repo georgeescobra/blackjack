@@ -12,10 +12,8 @@ Deck::Deck(const double numOfDeck){
         for(int s=0; s<4; s++){
             for(int v=0; v<13; v++){
                 std::stringstream newName;
-                std::string of = " of ";
-                newName << face[v].first << of << type[s];
-                card temp = {newName.str(), face[v].first, type[s] ,face[v].second};
-                deck.push_back(temp);
+                newName << face[v].first << std::string(" of ") << type[s];
+                deck.push_back({newName.str(), face[v].first, type[s] ,face[v].second});
             }
         }
     }
