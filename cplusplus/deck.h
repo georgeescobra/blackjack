@@ -19,6 +19,7 @@ class Deck{
         std::string getCardName();
         int getCardValue() const;
         void shuffleDeck();
+        std::vector<card>* getDeck();
    private:
         std::vector<card> deck;
         const std::string type[4] {"Hearts", "Spades", "Diamonds", "Clubs"};

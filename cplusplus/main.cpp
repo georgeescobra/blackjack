@@ -4,7 +4,7 @@
 #include <map>
 #include <sstream>
 #include "player.h"
-#include "deck.h"
+// #include "deck.h"
 
 void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
@@ -13,8 +13,10 @@ int main(){
     std::cout << "Welcome to Tsing's BlackJack Table!" << std::endl;
     printIntro();
     std::map<std::string, double> config = parseConfig("config.txt");
-    Deck gameDeck(config.at("num.fDecks")); // initializes the deck
+    Deck gameDeck(config.at("numOfDecks")); // initializes the deck
     gameDeck.shuffleDeck();
+    std::vector<Deck::card> *shuffledDeck = gameDeck.getDeck(); //hold the address of the actual deck, also don't need to free because this pointer is on the stack
+    // std::cout << shuffledDeck << std::endl; // only use delete if 'new' keyword is usued
 
     std::string Name;
     do{
@@ -25,6 +27,12 @@ int main(){
     Player newPlayer(Name, config["startingMoney"]); // initializes player
     Player Dealer("Dealer"); // Initializes Dealer
     // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl; // debug for player
+
+    newPlayer.drawPair(*shuffledDeck); 
+    newPlayer.showHand();
+    Dealer.drawPair(*shuffledDeck);
+    Dealer.showDealerHand();
+    // std::cout << (*shuffledDeck).size() << std::endl; // dereferences pointer and checks the size of deck
     
     return 0;
 }

@@ -32,3 +32,8 @@ void Deck::shuffleDeck(){
     }
     // printDeck();
 }
+
+std::vector<Deck::card>* Deck::getDeck(){
+    // std::cout << &deck << std::endl; // making sure that the deck's address holds
+    return &deck;
+}
