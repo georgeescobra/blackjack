@@ -4,6 +4,9 @@
 #include <map>
 #include <sstream>
 #include "player.h"
+#include "deck.h"
+
+#include <typeinfo>
 
 
 void printIntro();
@@ -24,6 +27,8 @@ int main(){
     while (Name.empty());
     Player newPlayer(Name, config["startingMoney"]);
     // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl;
+    // for (auto const& table : config) std::cout << table.first << ": " << table.second << std::endl;
+    Deck gameDeck(config["numOfDecks"]);
     
     return 0;
 }
@@ -55,6 +60,5 @@ std::map<std::string, double> parseConfig(const std::string configName){
         }
     }
     configFile.close();
-    // for (auto const& table : config) std::cout << table.first << ": " << table.second << std::endl;
     return config;
 }
