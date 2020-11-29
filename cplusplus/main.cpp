@@ -6,18 +6,15 @@
 #include "player.h"
 #include "deck.h"
 
-#include <typeinfo>
-
-
 void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
-
 
 int main(){
     std::cout << "Welcome to Tsing's BlackJack Table!" << std::endl;
     printIntro();
     std::map<std::string, double> config = parseConfig("config.txt");
-
+    Deck gameDeck(config.at("num.fDecks")); // initializes the deck
+    gameDeck.shuffleDeck();
 
     std::string Name;
     do{
@@ -25,15 +22,12 @@ int main(){
         std::cin >> Name;
     } 
     while (Name.empty());
-    Player newPlayer(Name, config["startingMoney"]);
-    // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl;
-    // for (auto const& table : config) std::cout << table.first << ": " << table.second << std::endl;
-    Deck gameDeck(config["numOfDecks"]); // initializes the deck
-    gameDeck.shuffleDeck();
+    Player newPlayer(Name, config["startingMoney"]); // initializes player
+    Player Dealer("Dealer"); // Initializes Dealer
+    // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl; // debug for player
     
     return 0;
 }
-
 
 void printIntro(){
     std::ifstream introFile;
@@ -61,5 +55,6 @@ std::map<std::string, double> parseConfig(const std::string configName){
         }
     }
     configFile.close();
+    // for (auto const& table : config) std::cout << table.first << ": " << table.second << std::endl;
     return config;
 }

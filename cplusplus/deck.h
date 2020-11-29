@@ -6,13 +6,20 @@
 #include <string>
 
 class Deck{
-    private:
+    public:
         struct card{
             std::string name;
             std::string kind;
             std::string suit;
             int value;
-        };
+        }; 
+        Deck(const double);
+        int drawCard();
+        int drawPair();
+        std::string getCardName();
+        int getCardValue() const;
+        void shuffleDeck();
+   private:
         std::vector<card> deck;
         const std::string type[4] {"Hearts", "Spades", "Diamonds", "Clubs"};
         const std::vector<std::pair<std::string, int>> face {
@@ -31,14 +38,7 @@ class Deck{
             {"Ace", 11}
         };
         void printDeck();
-    public:
-            Deck(const double);
-            int drawCard();
-            int drawPair();
-            std::string getCardName();
-            int getCardValue() const;
-            void shuffleDeck();
-        
+ 
 };
  
 #endif /* DECK_H */ 
