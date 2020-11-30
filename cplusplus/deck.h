@@ -14,8 +14,6 @@ class Deck{
             int value;
         }; 
         Deck(const double);
-        int drawCard();
-        int drawPair();
         std::string getCardName();
         int getCardValue() const;
         void shuffleDeck();

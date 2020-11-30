@@ -8,9 +8,13 @@
 
 void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
+void initialDraw(Player&, Player&, std::vector<Deck::card>&);
+std::string askToHitOrStay();
+bool checkWhoWon(Player&, Player&);
 
 int main(){
     std::cout << "Welcome to Tsing's BlackJack Table!" << std::endl;
+    bool gameRunning = true;
     printIntro();
     std::map<std::string, double> config = parseConfig("config.txt");
     Deck gameDeck(config.at("numOfDecks")); // initializes the deck
@@ -28,13 +32,49 @@ int main(){
     Player Dealer("Dealer"); // Initializes Dealer
     // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl; // debug for player
 
-    newPlayer.drawPair(*shuffledDeck); 
-    newPlayer.showHand();
-    Dealer.drawPair(*shuffledDeck);
-    Dealer.showDealerHand();
-    // std::cout << (*shuffledDeck).size() << std::endl; // dereferences pointer and checks the size of deck
-    
+    bool roundOver = false;
+    while(gameRunning){
+        std::cout << "------NEW ROUND------\n";
+        std::string playerStatus = "PLAYING"; // LOST, WON, DRAW, PLAYING
+        if (!roundOver) initialDraw(newPlayer, Dealer, *shuffledDeck);
+        roundOver = newPlayer.checkPlayerHandValue();
+        int playerValue = newPlayer.getHandValue();
+        if (playerValue >= 21){
+            std::cout << "Dealer Shows: \n";
+            Dealer.showHand();
+            int dealerValue = Dealer.getHandValue();
+            if(playerValue > 21 || (playerValue < dealerValue && dealerValue <= 21) || (playerValue > 21 && dealerValue > 21)) playerStatus = "LOST";
+            else if(playerValue > dealerValue || (playerValue <= 21 && dealerValue > 21)) playerStatus = "WON";
+            else if(playerValue == dealerValue) playerStatus = "DRAW";
+            Dealer.printHandValue();
+            std::cout << "Player Status: " << playerStatus << "\n";
+            break;        
+        }
+
+        newPlayer.clearHand();
+        Dealer.clearHand();
+        std::cout << "---------------------\n\n";
+    }
     return 0;
+}
+
+void initialDraw(Player &newPlayer,Player &Dealer, std::vector<Deck::card> &shuffledDeck){
+    std::cout << newPlayer.getName() << "'s Money: " << newPlayer.getMoney() << "\n";
+    newPlayer.drawPair(shuffledDeck); 
+    newPlayer.showHand();
+    Dealer.drawPair(shuffledDeck);
+    Dealer.showDealerHand();
+    newPlayer.printHandValue(); 
+}
+
+bool checkWhoWon(Player &newPlayer, Player &Dealer){
+}
+
+std::string askToHitOrStay(){
+    std::string temp;
+    std::cout << "Would you like to Hit(H) or Stay(S): ";
+    std::cin >> temp;
+    return temp;
 }
 
 void printIntro(){
