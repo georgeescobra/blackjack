@@ -3,52 +3,52 @@
 #include <string>
 #include <map>
 #include <sstream>
+#include <cctype>
 #include "player.h"
 // #include "deck.h"
 
 void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
-void initialDraw(Player&, Player&, std::vector<Deck::card>&);
+double initialDraw(Player&, Player&, std::vector<Deck::card>&);
 std::string askToHitOrStay();
 bool checkWhoWon(Player&, Player&);
 
 int main(){
     std::cout << "Welcome to Tsing's BlackJack Table!" << std::endl;
-    bool gameRunning = true;
     printIntro();
     std::map<std::string, double> config = parseConfig("config.txt");
     Deck gameDeck(config.at("numOfDecks")); // initializes the deck
     gameDeck.shuffleDeck();
     std::vector<Deck::card> *shuffledDeck = gameDeck.getDeck(); //hold the address of the actual deck, also don't need to free because this pointer is on the stack
+    bool gameRunning = true;
     // std::cout << shuffledDeck << std::endl; // only use delete if 'new' keyword is usued
 
     std::string Name;
     do{
         std::cout << "Please enter your name: ";
-        std::cin >> Name;
+        std::getline(std::cin, Name);
     } 
-    while (Name.empty());
+    while (Name.empty() || Name.compare(" ") == 0);
     Player newPlayer(Name, config["startingMoney"]); // initializes player
     Player Dealer("Dealer"); // Initializes Dealer
     // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl; // debug for player
 
     bool roundOver = false;
-    while(gameRunning){
+    while(gameRunning && (*shuffledDeck).size() > 4){
         std::cout << "------NEW ROUND------\n";
         std::string playerStatus = "PLAYING"; // LOST, WON, DRAW, PLAYING
         if (!roundOver) initialDraw(newPlayer, Dealer, *shuffledDeck);
         roundOver = newPlayer.checkPlayerHandValue();
         int playerValue = newPlayer.getHandValue();
+        // check after initial draw
         if (playerValue >= 21){
-            std::cout << "Dealer Shows: \n";
+            std::cout << "***Dealer Shows*** \n";
             Dealer.showHand();
             int dealerValue = Dealer.getHandValue();
             if(playerValue > 21 || (playerValue < dealerValue && dealerValue <= 21) || (playerValue > 21 && dealerValue > 21)) playerStatus = "LOST";
-            else if(playerValue > dealerValue || (playerValue <= 21 && dealerValue > 21)) playerStatus = "WON";
+            else if((playerValue == 21 && dealerValue < playerValue) || (playerValue == 21 && dealerValue > 21)) playerStatus = "WON";
             else if(playerValue == dealerValue) playerStatus = "DRAW";
             Dealer.printHandValue();
-            std::cout << "Player Status: " << playerStatus << "\n";
-            break;        
         }
 
         newPlayer.clearHand();
@@ -58,13 +58,29 @@ int main(){
     return 0;
 }
 
-void initialDraw(Player &newPlayer,Player &Dealer, std::vector<Deck::card> &shuffledDeck){
-    std::cout << newPlayer.getName() << "'s Money: " << newPlayer.getMoney() << "\n";
+double initialDraw(Player &newPlayer,Player &Dealer, std::vector<Deck::card> &shuffledDeck){
+    std::string stringToCheck = "";
+    double moneyToBet = 0;
+    do{
+        std::cout << "You have $" << newPlayer.getMoney() << " \nHow much would you like to bet? ";
+        std::getline(std::cin, stringToCheck);
+        bool valid = true;
+        // std::cout << stringToCheck << "sdfsdf";
+        if(stringToCheck.empty()) continue;
+        for(char const &c : stringToCheck){ 
+            if(!valid) break;
+            valid = (!std::isdigit(c) || std::isspace(c)) ? false : true;
+        }
+        if(valid) moneyToBet = std::stod(stringToCheck);
+        if(moneyToBet <= 0 || moneyToBet > newPlayer.getMoney()) std::cout << "Enter Valid Amount.\n";
+    }while(moneyToBet <= 0 || moneyToBet > newPlayer.getMoney());
     newPlayer.drawPair(shuffledDeck); 
     newPlayer.showHand();
     Dealer.drawPair(shuffledDeck);
     Dealer.showDealerHand();
     newPlayer.printHandValue(); 
+
+    return moneyToBet;
 }
 
 bool checkWhoWon(Player &newPlayer, Player &Dealer){

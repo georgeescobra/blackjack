@@ -31,9 +31,9 @@ class Deck{
             {"Eight", 8},
             {"Nine", 9},
             {"Ten", 10},
-            {"Jack", 11},
-            {"Queen", 11},
-            {"King", 11},
+            {"Jack", 10},
+            {"Queen", 10},
+            {"King", 10},
             {"Ace", 11}
         };
         void printDeck();

@@ -12,7 +12,7 @@ Player::Player(const std::string name){
     money = (name == "Dealer") ? HUGE_VAL : 500.0;
 }
 
-void Player::drawPair(std::vector<Deck::card>& deck){
+void Player::drawPair(std::vector<Deck::card> &deck){
 
     hand.push_back(deck.front());
     deck.erase(deck.begin());
@@ -20,7 +20,7 @@ void Player::drawPair(std::vector<Deck::card>& deck){
     deck.erase(deck.begin());
 }
 
-void Player::drawCard(std::vector<Deck::card>& deck){
+void Player::drawCard(std::vector<Deck::card> &deck){
     hand.push_back(deck.front());
     deck.erase(deck.begin());
 }

@@ -1,6 +1,6 @@
 .SUFFIXES: .cpp .o
 CXX = g++
-CXXFLAGS = -g
+CXXFLAGS = -g  -Wall
 EXECUTE = main
 OBJECTS = player.o deck.o main.o
 
