@@ -5,7 +5,8 @@
 #include <sstream>
 #include <cctype>
 #include "player.h"
-// #include "deck.h"
+#include "deck.h"
+
 
 void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
