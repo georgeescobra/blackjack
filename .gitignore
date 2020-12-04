@@ -2,4 +2,6 @@
 *.o
 tempCodeRunnerFile.cpp
 tags
+tags.lock
+tags.temp
 .project

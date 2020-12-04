@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include "deck.h"
+
 class Player{
     private: 
         std::string Name;
@@ -25,6 +26,4 @@ class Player{
         void operator+(const double);
        
 };
-
-
 #endif /* PLAYER_H */

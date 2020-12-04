@@ -5,14 +5,14 @@
 #include <sstream>
 #include <cctype>
 #include "player.h"
-#include "deck.h"
 
 
 void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
 double initialDraw(Player&, Player&, std::vector<Deck::card>&);
 std::string askToHitOrStay();
-bool checkWhoWon(Player&, Player&);
+bool checkWhoWon(Player&, Player&, int);
+void bothDraw(Player&, Player&, std::vector<Deck::card>&);
 
 int main(){
     std::cout << "Welcome to Tsing's BlackJack Table!" << std::endl;
@@ -35,22 +35,41 @@ int main(){
     // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl; // debug for player
 
     bool roundOver = false;
+    double multiplier = config.at("multiplier");
+    double moneyToBet = 0.0;
+    enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING}; // 0, 1, 2
     while(gameRunning && (*shuffledDeck).size() > 4){
+        /*      1. Do an initial draw
+         *          1a. Check if Dealer or if Player has a 21
+         *          1b. If either of this: round ends
+         *          1c. SKIP TO PAY OUT
+         *      2. Player can either hit or stand up until either he busts or stands
+         *          2a. If he busts SKIP TO PAY OUT
+         *      3. If player stands, dealer here is guaranteed to be under 21 DEALER TURN
+         *          3a. DEALER SHOWS 
+         *          3b. if dealerV > playerV: STAND DEALER WINS
+         *          3c. If dealer < 17 && dealerV < playerV: HIT until dealer either busts or value is greater than players
+         *      4. PAYOUT
+         *      5. CHECK IF PLAYER STILL HAS MONEY IF NOT GAME ENDS
+         *      6. IF PLAYER STILL HAS MONEY ASK IF HE WANTS TO CONTINUE AND RESET
+         */
         std::cout << "------NEW ROUND------\n";
-        std::string playerStatus = "PLAYING"; // LOST, WON, DRAW, PLAYING
-        if (!roundOver) initialDraw(newPlayer, Dealer, *shuffledDeck);
+        PLAYERSTATUS playerStatus = PLAYERSTATUS::PLAYING; // LOST, WON, DRAW, PLAYING
+        if (!roundOver) moneyToBet = initialDraw(newPlayer, Dealer, *shuffledDeck);
         roundOver = newPlayer.checkPlayerHandValue();
         int playerValue = newPlayer.getHandValue();
-        // check after initial draw
-        if (playerValue >= 21){
+        int dealerValue = Dealer.getHandValue();
+        if (playerValue == 21 || dealerValue == 21){ // check after initial draw if player draws a 21, cannot auto bust ;) natural 21 always win
             std::cout << "***Dealer Shows*** \n";
             Dealer.showHand();
             int dealerValue = Dealer.getHandValue();
-            if(playerValue > 21 || (playerValue < dealerValue && dealerValue <= 21) || (playerValue > 21 && dealerValue > 21)) playerStatus = "LOST";
-            else if((playerValue == 21 && dealerValue < playerValue) || (playerValue == 21 && dealerValue > 21)) playerStatus = "WON";
-            else if(playerValue == dealerValue) playerStatus = "DRAW";
+            if (playerValue == dealerValue) playerStatus = PLAYERSTATUS::DRAW;
+            else if (playerValue < dealerValue) playerStatus = PLAYERSTATUS::LOST;
+            else if (playerValue > dealerValue) playerStatus = PLAYERSTATUS::WON;
             Dealer.printHandValue();
         }
+        // if player is still playing
+        
 
         newPlayer.clearHand();
         Dealer.clearHand();
@@ -66,7 +85,6 @@ double initialDraw(Player &newPlayer,Player &Dealer, std::vector<Deck::card> &sh
         std::cout << "You have $" << newPlayer.getMoney() << " \nHow much would you like to bet? ";
         std::getline(std::cin, stringToCheck);
         bool valid = true;
-        // std::cout << stringToCheck << "sdfsdf";
         if(stringToCheck.empty()) continue;
         for(char const &c : stringToCheck){ 
             if(!valid) break;
@@ -75,16 +93,21 @@ double initialDraw(Player &newPlayer,Player &Dealer, std::vector<Deck::card> &sh
         if(valid) moneyToBet = std::stod(stringToCheck);
         if(moneyToBet <= 0 || moneyToBet > newPlayer.getMoney()) std::cout << "Enter Valid Amount.\n";
     }while(moneyToBet <= 0 || moneyToBet > newPlayer.getMoney());
+    bothDraw(newPlayer, Dealer, shuffledDeck);
+    return moneyToBet;
+}
+
+void bothDraw(Player &newPlayer, Player &Dealer, std::vector<Deck::card> &shuffledDeck){
     newPlayer.drawPair(shuffledDeck); 
     newPlayer.showHand();
     Dealer.drawPair(shuffledDeck);
     Dealer.showDealerHand();
     newPlayer.printHandValue(); 
-
-    return moneyToBet;
 }
 
-bool checkWhoWon(Player &newPlayer, Player &Dealer){
+
+bool checkWhoWon(Player &newPlayer, Player &Dealer, int playerStatus){
+    return false;
 }
 
 std::string askToHitOrStay(){

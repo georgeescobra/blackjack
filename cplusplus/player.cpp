@@ -33,7 +33,7 @@ void Player::showHand() const{
 
 void Player::showDealerHand() const{
     std::cout << "Dealer's Cards: " << std::endl;
-    for(int i = 0; i < hand.size(); i++){
+    for(unsigned int i = 0; i < hand.size(); i++){
         (i != 0) ? (std::cout << "\t" << hand[i].name << std::endl) : (std::cout << "\t[hidden]" << std::endl);
     }
 }
