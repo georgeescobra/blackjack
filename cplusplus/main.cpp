@@ -4,13 +4,14 @@
 #include <map>
 #include <sstream>
 #include <cctype>
+#include <regex>
 #include "player.h"
 
 
 void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
 double initialDraw(Player&, Player&, std::vector<Deck::card>&);
-std::string askToHitOrStay();
+int askToHitOrStay();
 bool checkWhoWon(Player&, Player&, int);
 void bothDraw(Player&, Player&, std::vector<Deck::card>&);
 
@@ -68,6 +69,11 @@ int main(){
             else if (playerValue > dealerValue) playerStatus = PLAYERSTATUS::WON;
             Dealer.printHandValue();
         }
+        int playerChoice;
+        if (playerStatus == PLAYERSTATUS::PLAYING){ // after initial check, player gets to hit or stay
+            playerChoice =  askToHitOrStay(); // 0 h 1 s
+
+        }
         // if player is still playing
         
 
@@ -110,11 +116,18 @@ bool checkWhoWon(Player &newPlayer, Player &Dealer, int playerStatus){
     return false;
 }
 
-std::string askToHitOrStay(){
-    std::string temp;
-    std::cout << "Would you like to Hit(H) or Stay(S): ";
-    std::cin >> temp;
-    return temp;
+int askToHitOrStay(){ // 0 -> hit, 1 -> stay
+    std::string playerChoice;
+    bool h;
+    bool s;
+    do{
+        std::cout << "Would you like to Hit(H) or Stay(S): "; 
+        std::getline(std::cin, playerChoice);
+        h = std::regex_search(playerChoice, std::regex{R"(^[hH]\w*)"});
+        s = std::regex_search(playerChoice, std::regex{R"(^[sS]\w*)"});
+        std::cout << h << std::endl;
+    }while(playerChoice.empty() || (!h && !s));
+    return (h) ? 0 : 1;
 }
 
 void printIntro(){
@@ -128,7 +141,7 @@ void printIntro(){
         
 }
 
-std::map<std::string, double> parseConfig(const std::string configName){
+std::map<std::string, double> parseConfig(const std::string configName){ // prases the necessary configs for the game
     std::map<std::string, double>config;
     std::ifstream configFile;
     configFile.open(configName, std::ios::out);
