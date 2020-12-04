@@ -38,7 +38,7 @@ int main(){
     bool roundOver = false;
     double multiplier = config.at("multiplier");
     double moneyToBet = 0.0;
-    enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING}; // 0, 1, 2
+    enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING, NOTPLAYING}; // 0, 1, 2
     while(gameRunning && (*shuffledDeck).size() > 4){
         /*      1. Do an initial draw
          *          1a. Check if Dealer or if Player has a 21
@@ -56,11 +56,12 @@ int main(){
          */
         std::cout << "------NEW ROUND------\n";
         PLAYERSTATUS playerStatus = PLAYERSTATUS::PLAYING; // LOST, WON, DRAW, PLAYING
-        if (!roundOver) moneyToBet = initialDraw(newPlayer, Dealer, *shuffledDeck);
+        moneyToBet = initialDraw(newPlayer, Dealer, *shuffledDeck);
         roundOver = newPlayer.checkPlayerHandValue();
+        if(roundOver) playerStatus = PLAYERSTATUS::LOST; 
         int playerValue = newPlayer.getHandValue();
         int dealerValue = Dealer.getHandValue();
-        if (playerValue == 21 || dealerValue == 21){ // check after initial draw if player draws a 21, cannot auto bust ;) natural 21 always win
+        if (playerValue == 21 || dealerValue == 21 || playerStatus == PLAYERSTATUS::PLAYING){ // check after initial draw if player draws a 21, cannot auto bust ;) natural 21 always win
             std::cout << "***Dealer Shows*** \n";
             Dealer.showHand();
             int dealerValue = Dealer.getHandValue();
@@ -70,10 +71,22 @@ int main(){
             Dealer.printHandValue();
         }
         int playerChoice;
-        if (playerStatus == PLAYERSTATUS::PLAYING){ // after initial check, player gets to hit or stay
+        while(playerStatus == PLAYERSTATUS::PLAYING){ // after initial check, player gets to hit or stay
             playerChoice =  askToHitOrStay(); // 0 h 1 s
-
+            if (playerChoice == 1) playerStatus = PLAYERSTATUS::NOTPLAYING;
+            else{
+                newPlayer.drawCard(*shuffledDeck);
+                newPlayer.showHand();
+                if (newPlayer.getHandValue() >= 21) playerStatus = PLAYERSTATUS::NOTPLAYING;
+            }
         }
+        while(Dealer.getHandValue() <= 21 && (playerStatus != PLAYERSTATUS::PLAYING || playerStatus != PLAYERSTATUS::LOST)){ // dealer turns 
+            /*      dealer should hit if hand < players
+             *      dealer should stop if hand > players or busts
+             */
+            std::cout << "DEALERS TURN" << std::endl;
+        }
+
         // if player is still playing
         
 
@@ -88,7 +101,7 @@ double initialDraw(Player &newPlayer,Player &Dealer, std::vector<Deck::card> &sh
     std::string stringToCheck = "";
     double moneyToBet = 0;
     do{
-        std::cout << "You have $" << newPlayer.getMoney() << " \nHow much would you like to bet? ";
+        std::cout << "You have $" << newPlayer.getMoney() << " \nHow much would you like to bet? $";
         std::getline(std::cin, stringToCheck);
         bool valid = true;
         if(stringToCheck.empty()) continue;
