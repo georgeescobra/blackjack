@@ -24,7 +24,7 @@ int main(){
     Deck gameDeck(config.at("numOfDecks")); // initializes the deck
     gameDeck.shuffleDeck();
     std::vector<Deck::card> *shuffledDeck = gameDeck.getDeck(); //hold the address of the actual deck, also don't need to free because this pointer is on the stack
-    bool gameRunning = true;
+    int gameRunning = 0;
     // std::cout << shuffledDeck << std::endl; // only use delete if 'new' keyword is usued
 
     std::string Name;
@@ -40,7 +40,7 @@ int main(){
     double multiplier = config.at("multiplier");
     double moneyToBet = 0.0;
     enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING, NOTPLAYING}; // 0, 1, 2
-    while(gameRunning && (*shuffledDeck).size() > 4 && newPlayer.getMoney() > 0){
+    while(gameRunning == 0 && (*shuffledDeck).size() > 4 && newPlayer.getMoney() > 0){
         /*      1. Do an initial draw
          *          1a. Check if Dealer or if Player has a 21
          *          1b. If either of this: round ends
@@ -65,7 +65,6 @@ int main(){
         if (playerValue == 21 || dealerValue == 21){ // check after initial draw if player draws a 21, cannot auto bust ;) natural 21 always win
             std::cout << "***Dealer Shows*** \n";
             Dealer.showHand();
-            int dealerValue = Dealer.getHandValue();
             if (playerValue == dealerValue) playerStatus = PLAYERSTATUS::DRAW;
             else if (playerValue < dealerValue) playerStatus = PLAYERSTATUS::LOST;
             else if (playerValue > dealerValue) playerStatus = PLAYERSTATUS::WON;
@@ -85,7 +84,7 @@ int main(){
                 if (newPlayer.getHandValue() > 21) playerStatus = PLAYERSTATUS::LOST;
             }
         }
-        while(Dealer.getHandValue() < 21 && (playerStatus != PLAYERSTATUS::PLAYING && playerStatus != PLAYERSTATUS::LOST)){ // dealer turns 
+        while(Dealer.getHandValue() < 21 && (playerStatus == PLAYERSTATUS::NOTPLAYING)){ // dealer turns 
             /*      dealer should hit if hand < players
              *      dealer should stop if hand > players or busts
              *   need to check for Ace's, if hand goes over 21 with an Ace, Ace value goes to 1
@@ -110,7 +109,14 @@ int main(){
         checkWhoWon(newPlayer, Dealer, playerStatus, multiplier, moneyToBet);
         newPlayer.clearHand();
         Dealer.clearHand();
-        if(newPlayer.getMoney() < 0) std::cout << "YOU HAVE RAN OUT OF MONEY\n";
+        if(newPlayer.getMoney() < 0){
+            std::cout << "YOU HAVE RAN OUT OF MONEY\n";
+            break;
+        }
+        if(toContinue() == 1){
+            gameRunning = 1;
+            std::cout << "THANK YOU FOR PLAYING " << newPlayer.getName() << "!\n";
+        }
         std::cout << "---------------------\n\n";
     }
     return 0;
@@ -179,6 +185,19 @@ int askToHitOrStay(){ // 0 -> hit, 1 -> stay
         s = std::regex_search(playerChoice, std::regex{R"(^[sS]\w*)"});
     }while(playerChoice.empty() || (!h && !s));
     return (h) ? 0 : 1;
+}
+
+int toContinue(){ // 0 -> cont, 1 -> No
+    std::string playerChoice;
+    bool y;
+    bool n;
+    do{
+        std::cout << "Would you like to Continue Playing? Yes(Y) or No(N): "; 
+        std::getline(std::cin, playerChoice);
+        y = std::regex_search(playerChoice, std::regex{R"(^[yY]\w*)"});
+        n = std::regex_search(playerChoice, std::regex{R"(^[nN]\w*)"});
+    }while(playerChoice.empty() || (!y && !n));
+    return (y) ? 0 : 1;
 }
 
 void printIntro(){
