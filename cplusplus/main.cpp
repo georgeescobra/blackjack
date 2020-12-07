@@ -13,8 +13,9 @@ void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
 double initialDraw(Player&, Player&, std::vector<Deck::card>&);
 int askToHitOrStay();
-void checkWhoWon(Player&, Player&, int, int, int);
+void checkWhoWon(Player&, Player&, int, double, double);
 void bothDraw(Player&, Player&, std::vector<Deck::card>&);
+int toContinue();
 
 int main(){
     std::cout << "Welcome to Tsing's BlackJack Table!" << std::endl;
@@ -39,7 +40,7 @@ int main(){
     double multiplier = config.at("multiplier");
     double moneyToBet = 0.0;
     enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING, NOTPLAYING}; // 0, 1, 2
-    while(gameRunning && (*shuffledDeck).size() > 4){
+    while(gameRunning && (*shuffledDeck).size() > 4 && newPlayer.getMoney() > 0){
         /*      1. Do an initial draw
          *          1a. Check if Dealer or if Player has a 21
          *          1b. If either of this: round ends
@@ -109,6 +110,7 @@ int main(){
         checkWhoWon(newPlayer, Dealer, playerStatus, multiplier, moneyToBet);
         newPlayer.clearHand();
         Dealer.clearHand();
+        if(newPlayer.getMoney() < 0) std::cout << "YOU HAVE RAN OUT OF MONEY\n";
         std::cout << "---------------------\n\n";
     }
     return 0;
@@ -142,7 +144,7 @@ void bothDraw(Player &newPlayer, Player &Dealer, std::vector<Deck::card> &shuffl
 }
 
 
-void checkWhoWon(Player &newPlayer, Player &Dealer, int playerStatus, int multi, int bet){
+void checkWhoWon(Player &newPlayer, Player &Dealer, int playerStatus, double multi, double bet){
     // enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING, NOTPLAYING}; // 0, 1, 2
     std::cout << "\t********RESULTS********\n";
     newPlayer.showHand();
@@ -155,9 +157,11 @@ void checkWhoWon(Player &newPlayer, Player &Dealer, int playerStatus, int multi,
             break;
         case (1):
             std::cout << "\t********" << newPlayer.getName() << " " << "WON!!********\n";
+            newPlayer += ((multi)*(bet));
             break;
         case (2):
             std::cout << "\t********" <<newPlayer.getName() << " " << "LOST!!********\n";
+            newPlayer += ((-1)*(multi)*(bet));
             break;
         default:
             std::cout << newPlayer.getName() << " " << "STATUS DIDNT CHANGE!!\n";
