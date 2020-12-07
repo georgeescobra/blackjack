@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cctype>
 #include <regex>
+#include <unistd.h>
 #include "player.h"
 
 
@@ -12,7 +13,7 @@ void printIntro();
 std::map<std::string, double> parseConfig(const std::string);
 double initialDraw(Player&, Player&, std::vector<Deck::card>&);
 int askToHitOrStay();
-bool checkWhoWon(Player&, Player&, int);
+void checkWhoWon(Player&, Player&, int, int, int);
 void bothDraw(Player&, Player&, std::vector<Deck::card>&);
 
 int main(){
@@ -35,7 +36,6 @@ int main(){
     Player Dealer("Dealer"); // Initializes Dealer
     // cout << "Name: " << newPlayer.getName() << " " << "Money: " << newPPlayer.getMoney() << endl; // debug for player
 
-    bool roundOver = false;
     double multiplier = config.at("multiplier");
     double moneyToBet = 0.0;
     enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING, NOTPLAYING}; // 0, 1, 2
@@ -57,11 +57,11 @@ int main(){
         std::cout << "------NEW ROUND------\n";
         PLAYERSTATUS playerStatus = PLAYERSTATUS::PLAYING; // LOST, WON, DRAW, PLAYING
         moneyToBet = initialDraw(newPlayer, Dealer, *shuffledDeck);
-        roundOver = newPlayer.checkPlayerHandValue();
-        if(roundOver) playerStatus = PLAYERSTATUS::LOST; 
+        newPlayer.checkForAces();
+        Dealer.checkForAces();
         int playerValue = newPlayer.getHandValue();
         int dealerValue = Dealer.getHandValue();
-        if (playerValue == 21 || dealerValue == 21 || playerStatus == PLAYERSTATUS::PLAYING){ // check after initial draw if player draws a 21, cannot auto bust ;) natural 21 always win
+        if (playerValue == 21 || dealerValue == 21){ // check after initial draw if player draws a 21, cannot auto bust ;) natural 21 always win
             std::cout << "***Dealer Shows*** \n";
             Dealer.showHand();
             int dealerValue = Dealer.getHandValue();
@@ -75,21 +75,38 @@ int main(){
             playerChoice =  askToHitOrStay(); // 0 h 1 s
             if (playerChoice == 1) playerStatus = PLAYERSTATUS::NOTPLAYING;
             else{
+                // need to check for Ace's, if hand goes over 21 with an Ace, Ace value goes to 1
                 newPlayer.drawCard(*shuffledDeck);
+                newPlayer.checkForAces();
                 newPlayer.showHand();
-                if (newPlayer.getHandValue() >= 21) playerStatus = PLAYERSTATUS::NOTPLAYING;
+                newPlayer.printHandValue();
+                if (newPlayer.getHandValue() == 21) playerStatus =  PLAYERSTATUS::NOTPLAYING;
+                if (newPlayer.getHandValue() > 21) playerStatus = PLAYERSTATUS::LOST;
             }
         }
-        while(Dealer.getHandValue() <= 21 && (playerStatus != PLAYERSTATUS::PLAYING || playerStatus != PLAYERSTATUS::LOST)){ // dealer turns 
+        while(Dealer.getHandValue() < 21 && (playerStatus != PLAYERSTATUS::PLAYING && playerStatus != PLAYERSTATUS::LOST)){ // dealer turns 
             /*      dealer should hit if hand < players
              *      dealer should stop if hand > players or busts
+             *   need to check for Ace's, if hand goes over 21 with an Ace, Ace value goes to 1
              */
-            std::cout << "DEALERS TURN" << std::endl;
+            if (Dealer.getHandValue() > newPlayer.getHandValue()) {
+                playerStatus = PLAYERSTATUS::LOST; // premptive check before draw
+                continue;
+            }
+            Dealer.drawCard(*shuffledDeck);
+            Dealer.checkForAces();
+            Dealer.showHand();
+            Dealer.printHandValue();
+            if (Dealer.getHandValue() > 21) playerStatus = PLAYERSTATUS::WON;
+            if (Dealer.getHandValue() == newPlayer.getHandValue()){
+                playerStatus = PLAYERSTATUS::DRAW;
+                break;
+            }
+            if (Dealer.getHandValue() <= 21 && Dealer.getHandValue() > newPlayer.getHandValue() ) playerStatus = PLAYERSTATUS::LOST;
+            sleep(1);
         }
-
-        // if player is still playing
         
-
+        checkWhoWon(newPlayer, Dealer, playerStatus, multiplier, moneyToBet);
         newPlayer.clearHand();
         Dealer.clearHand();
         std::cout << "---------------------\n\n";
@@ -125,8 +142,26 @@ void bothDraw(Player &newPlayer, Player &Dealer, std::vector<Deck::card> &shuffl
 }
 
 
-bool checkWhoWon(Player &newPlayer, Player &Dealer, int playerStatus){
-    return false;
+void checkWhoWon(Player &newPlayer, Player &Dealer, int playerStatus, int multi, int bet){
+    // enum PLAYERSTATUS {DRAW, WON , LOST, PLAYING, NOTPLAYING}; // 0, 1, 2
+    std::cout << "\t********RESULTS********\n";
+    newPlayer.showHand();
+    newPlayer.printHandValue();
+    Dealer.showHand();
+    Dealer.printHandValue();
+    switch(playerStatus){
+        case (0):
+            std::cout << "\t********" << newPlayer.getName() << " " << "DRAW!!********\n";
+            break;
+        case (1):
+            std::cout << "\t********" << newPlayer.getName() << " " << "WON!!********\n";
+            break;
+        case (2):
+            std::cout << "\t********" <<newPlayer.getName() << " " << "LOST!!********\n";
+            break;
+        default:
+            std::cout << newPlayer.getName() << " " << "STATUS DIDNT CHANGE!!\n";
+    }
 }
 
 int askToHitOrStay(){ // 0 -> hit, 1 -> stay
@@ -138,7 +173,6 @@ int askToHitOrStay(){ // 0 -> hit, 1 -> stay
         std::getline(std::cin, playerChoice);
         h = std::regex_search(playerChoice, std::regex{R"(^[hH]\w*)"});
         s = std::regex_search(playerChoice, std::regex{R"(^[sS]\w*)"});
-        std::cout << h << std::endl;
     }while(playerChoice.empty() || (!h && !s));
     return (h) ? 0 : 1;
 }

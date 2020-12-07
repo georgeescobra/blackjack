@@ -18,6 +18,7 @@ class Player{
         void drawPair(std::vector<Deck::card>&); // takes the deck reference address instead of creating temp copy value
         void drawCard(std::vector<Deck::card>&);
         void clearHand();
+        void checkForAces();
         double getMoney() const;
         std::string getName() const;
         int getHandValue() const;

@@ -42,6 +42,12 @@ bool Player::checkPlayerHandValue() const{
     return (this->getHandValue() >= 21) ? true : false;
 }
 
+void Player::checkForAces() {
+    for(auto &c : this->hand){
+        if(c.value == 11 && this->getHandValue() > 21) c.value = 1;
+    }
+}
+
 void Player::clearHand() {
     this->hand.clear();
 }
