@@ -1,3 +1,4 @@
+import random
 class Card:
     def __init__(self, suit, rank, val):
         self.rank = rank
@@ -36,7 +37,7 @@ class Deck:
                 for rank in range(13):
                     self.deck.append(Card(kind[suit], ranks[rank][0], ranks[rank][1])) 
     def shuffle(self):
-        pass
+        random.shuffle(self.deck)
 
     def print(self):
         for card in self.deck: print(card)

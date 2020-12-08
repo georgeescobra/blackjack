@@ -50,6 +50,9 @@ def main():
     newPlayer = Player(name, config.get("startingMoney"))
     deck = Deck(config.get("numOfDecks"))
     deck.print()
+    deck.shuffle()
+    print()
+    deck.print()
 
 if __name__ == "__main__": main()
 
