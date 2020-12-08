@@ -36,6 +36,7 @@ class Deck:
             for suit in range(4):
                 for rank in range(13):
                     self.deck.append(Card(kind[suit], ranks[rank][0], ranks[rank][1])) 
+                        
     def shuffle(self):
         random.shuffle(self.deck)
 

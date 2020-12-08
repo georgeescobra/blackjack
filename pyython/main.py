@@ -1,6 +1,7 @@
 import re
 from player import Player
 from deck import Deck
+
 config = {
     "multiplier" : 1.5,
     "numOfDecks"  : 1,
@@ -19,7 +20,7 @@ If you choose to Hit you are given another card until you either reach 21, stay,
 If you Stay, round ends dealer flips his card.
 If you bust, you automatically lose the round.
 If you go even with the Dealer no money is gained nor lost.
-Value of 10->King is 10, Value of Ace is 11L: until value of hand is greater than 21, then it turns into 1
+Value of 10->King is 10, Value of Ace is 11: until value of hand is greater than 21, then it turns into 1
 --------------------------------
 """
 
@@ -49,9 +50,7 @@ def main():
     name = inputName()
     newPlayer = Player(name, config.get("startingMoney"))
     deck = Deck(config.get("numOfDecks"))
-    deck.print()
     deck.shuffle()
-    print()
     deck.print()
 
 if __name__ == "__main__": main()
