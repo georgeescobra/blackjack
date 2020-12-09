@@ -1,11 +1,12 @@
 import re
 from enum import Enum
+import time
 from player import Player
 from deck import Deck
 
 config = {
     "multiplier" : 1.5,
-    "numOfDecks"  : 1,
+    "numOfDecks"  : 3,
     "startingMoney"  : 500.0
 }
 intro = """
@@ -112,10 +113,36 @@ def main():
                     playerHandValue = newPlayer.getHandValue()
                     if playerHandValue > 21: playerStatus = status.LOST
                 else: playerStatus = status.NOTPLAYING
+        playerHandValue = newPlayer.getHandValue()
+
+        # dealers turn
+        if playerStatus == status.NOTPLAYING: 
+            print("\tDEALER'S TURN")
+            print("Dealer Shows: ")
+            dealer.printHand()
+            dealer.printHandValue()
+            time.sleep(1)
+        while playerStatus == status.NOTPLAYING:
+            dealerHandValue = dealer.getHandValue()
+            if dealerHandValue > playerHandValue and dealerHandValue <= 21: playerStatus = status.LOST
+            elif dealerHandValue > 21: playerStatus = status.WON
+            elif dealerHandValue == playerHandValue: playerStatus = status.DRAW
+            else:
+                if 17 < dealerHandValue < 21 and (dealerHandValue == playerHandValue): playerStatus = status.DRAW
+                # i pretty much force a draw if dealerVal == playerVal
+                elif dealerHandValue < 21 and playerStatus == status.NOTPLAYING:
+                    print("--Dealer Hits--")
+                    dealer.addToHand(deck.drawOne())
+                    dealer.checkHandForAces()
+                    dealer.printHand()
+                    print("\r\tDealer's Hand Value: ", dealer.getHandValue())
+            if playerStatus == status.NOTPLAYING: time.sleep(1)
+
 
         print(playerStatus)
         # resets the round
         print("*******END OF ROUND*******")
+        print()
         newPlayer.clearHand()
         dealer.clearHand()
         playerStatus = status.PLAYING
