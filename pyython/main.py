@@ -61,10 +61,10 @@ def inputHitOrStay():
     sValid = False
     while not playerChoice or (not hValid and not sValid) :
         playerChoice = input("Would You Like to Hit(H) or Stay(S): ")
-        hValid = True if re.search(r"^[hH]\w+", playerChoice) else False
-        sValid = True if re.search(r"^[sS]\w+", playerChoice) else False
-        if not valid: print("Please Enter A Valid Choice Hit or Stay")
-    return playerChoice
+        hValid = True if re.search(r"^[hH]\w*", playerChoice) else False
+        sValid = True if re.search(r"^[sS]\w*", playerChoice) else False
+        if not sValid and not hValid: print("Please Enter A Valid Choice Hit or Stay")
+    return 0 if hValid else 1 
 
 def main():
     print(intro)
@@ -75,7 +75,7 @@ def main():
     deck = Deck(config.get("numOfDecks"))
     deck.shuffle()
     
-    while newPlayer.getMoney() and deck.getSize():
+    while newPlayer.getMoney() and deck.getSize() and playerStatus == status.PLAYING:
         print(newPlayer)
         amountToBet = inputBet(newPlayer.getMoney())
         print("*******STARTING ROUND*******")
@@ -103,14 +103,23 @@ def main():
                 print("You have no more money left")
                 playerStatus = playerStatus.NOTPLAYING
             else:
-                playerChoice = inputHitOrStay()
-
+                playerChoice = inputHitOrStay() # 0 -> hit, 1-> stay
+                if playerChoice == 0:
+                    newPlayer.addToHand(deck.drawOne())
+                    newPlayer.checkHandForAces()
+                    newPlayer.printHand()
+                    newPlayer.printHandValue()
+                    playerHandValue = newPlayer.getHandValue()
+                    if playerHandValue > 21: playerStatus = status.LOST
+                else: playerStatus = status.NOTPLAYING
 
         print(playerStatus)
         # resets the round
         print("*******END OF ROUND*******")
         newPlayer.clearHand()
         dealer.clearHand()
+        playerStatus = status.PLAYING
+
           
          
 

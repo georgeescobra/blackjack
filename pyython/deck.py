@@ -50,4 +50,4 @@ class Deck:
         return [self.deck.pop(0), self.deck.pop(0)]
 
     def drawOne(self):
-        return self.deck.pop(0)
+        return [self.deck.pop(0)]
