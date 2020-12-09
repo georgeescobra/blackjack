@@ -1,4 +1,5 @@
 import re
+from enum import Enum
 from player import Player
 from deck import Deck
 
@@ -24,44 +25,92 @@ Value of 10->King is 10, Value of Ace is 11: until value of hand is greater than
 --------------------------------
 """
 
+class status(Enum):
+    PLAYING = 0
+    NOTPLAYING = 1
+    WON = 2
+    LOST = 3
+    DRAW = 4
+    
+    def status(self):
+        pass
+
+
 def inputName():
     playerName = ""
     valid = False
     while not playerName or not valid :
         playerName = input("Please Enter Your Name: ")
-        valid = True if not re.search(r"\d+", playerName) else False
+        valid = True if not re.search(r"^\d+", playerName) else False
         if not valid: print("Please Enter Name with no numbers")
     return playerName
 
-def inputBet():
+def inputBet(playerMoney):
     playerBet = 0
     valid = False
     while not playerBet or not valid:
         playerBet = input("How Much Would You Like To Bet? $")
-        valid = True if not re.search(r"\w+", playerBet) else False
+        valid = True if re.search(r"^\d+", playerBet) else False
+        if valid and float(playerBet) > playerMoney: valid = False
         if not valid: print("Please Enter a Valid Amount")
     return float(playerBet)
 
 def inputHitOrStay():
-    pass
+    playerChoice = ""
+    hValid = False
+    sValid = False
+    while not playerChoice or (not hValid and not sValid) :
+        playerChoice = input("Would You Like to Hit(H) or Stay(S): ")
+        hValid = True if re.search(r"^[hH]\w+", playerChoice) else False
+        sValid = True if re.search(r"^[sS]\w+", playerChoice) else False
+        if not valid: print("Please Enter A Valid Choice Hit or Stay")
+    return playerChoice
 
 def main():
     print(intro)
     name = inputName()
     newPlayer = Player(name, config.get("startingMoney"))
+    playerStatus = status.PLAYING
     dealer = Player()
     deck = Deck(config.get("numOfDecks"))
     deck.shuffle()
     
     while newPlayer.getMoney() and deck.getSize():
-        print("*******NEW ROUND*******")
+        print(newPlayer)
+        amountToBet = inputBet(newPlayer.getMoney())
+        print("*******STARTING ROUND*******")
         newPlayer.addToHand(deck.drawTwo())
         dealer.addToHand(deck.drawTwo())
         newPlayer.printHand()
         newPlayer.printHandValue()
         dealer.printDealerHand()
-        break;
 
+        # makes sure no one auto busts
+        newPlayer.checkHandForAces() 
+        dealer.checkHandForAces()
+        playerHandValue = newPlayer.getHandValue()
+        dealerHandValue = dealer.getHandValue()
+
+        # initial check
+        if playerHandValue == 21 or dealerHandValue == 21:
+            if playerHandValue == 21 and dealerHandValue == 21: playerStatus = status.DRAW
+            elif playerHandValue < dealerHandValue: playerStatus = status.LOST
+            elif playerHandValue > dealerHandValue: playerStatus = status.WON
+
+        # player's choice to hit or stand
+        while playerStatus == status.PLAYING:
+            if newPlayer.getMoney() <= 0:
+                print("You have no more money left")
+                playerStatus = playerStatus.NOTPLAYING
+            else:
+                playerChoice = inputHitOrStay()
+
+
+        print(playerStatus)
+        # resets the round
+        print("*******END OF ROUND*******")
+        newPlayer.clearHand()
+        dealer.clearHand()
           
          
 

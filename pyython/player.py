@@ -23,6 +23,7 @@ class Player:
         for card in self.hand: print(f"\t{card}")
 
     def printDealerHand(self):
+        print(f"{self.name}'s Cards:")
         if self.name == "Dealer":
             i = 0
             for card in self.hand:
@@ -38,3 +39,12 @@ class Player:
 
     def printHandValue(self):
         print(f"{self.name}'s hand value: {self.getHandValue()}")
+
+    def checkHandForAces(self):
+        """ If hand contains aces and ahdn value > 21, change ace value to 1"""
+        for card in self.hand:
+            if self.getHandValue() > 21 and card.rank == "Ace":
+                card.value = 1
+
+    def clearHand(self):
+        self.hand = []
