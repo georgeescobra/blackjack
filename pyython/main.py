@@ -32,10 +32,9 @@ class status(Enum):
     WON = 2
     LOST = 3
     DRAW = 4
-    
-    def status(self):
-        pass
 
+def getConfig():
+    return [val for val in config.values()]
 
 def inputName():
     playerName = ""
@@ -67,13 +66,30 @@ def inputHitOrStay():
         if not sValid and not hValid: print("Please Enter A Valid Choice Hit or Stay")
     return 0 if hValid else 1 
 
+def endRoundPayout(player, betted, playerStatus, multiplier):
+    """
+        Checks who won
+        applies bet payout (positive or negative or neutral)
+    """ 
+    print(player.getName().upper(), playerStatus.name) 
+    if playerStatus == status.WON:
+        player += (betted*multiplier) 
+    elif playerStatus == status.LOST:
+        player -= (betted*multiplier) 
+    elif playerStatus == status.DRAW:
+        print()
+    else:
+        print("PLAYER STATUS HASNT CHANGED {playerStatus.name}")
+
+
 def main():
     print(intro)
     name = inputName()
-    newPlayer = Player(name, config.get("startingMoney"))
+    multiplier, numOfDecks, startingMoney = getConfig()
+    newPlayer = Player(name, startingMoney)
     playerStatus = status.PLAYING
     dealer = Player()
-    deck = Deck(config.get("numOfDecks"))
+    deck = Deck(numOfDecks)
     deck.shuffle()
     
     while newPlayer.getMoney() and deck.getSize() and playerStatus == status.PLAYING:
@@ -139,7 +155,10 @@ def main():
             if playerStatus == status.NOTPLAYING: time.sleep(1)
 
 
-        print(playerStatus)
+        # ending the round/checking who won
+        endRoundPayout(newPlayer, amountToBet, playerStatus, multiplier)
+        print(newPlayer)
+
         # resets the round
         print("*******END OF ROUND*******")
         print()

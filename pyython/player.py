@@ -8,6 +8,22 @@ class Player:
     def __str__(self):
         return f"{self.name} has ${self.money}"
 
+    def __add__(self, num):
+        self.money = self.money + num
+        return self
+
+    def __sub__(self, num):
+        self.money = self.money - num
+        return self
+
+    def __IADD__(self, num):
+        self.money = self.money + num
+        return self
+
+    def __ISUB__(self, num):
+        self.money =  self.money - num
+        return self
+
     def getName(self):
         return self.name
 
