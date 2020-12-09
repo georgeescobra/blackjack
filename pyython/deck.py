@@ -42,3 +42,12 @@ class Deck:
 
     def print(self):
         for card in self.deck: print(card)
+
+    def getSize(self):
+        return len(self.deck)
+
+    def drawTwo(self):
+        return [self.deck.pop(0), self.deck.pop(0)]
+
+    def drawOne(self):
+        return self.deck.pop(0)

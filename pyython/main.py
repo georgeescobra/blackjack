@@ -49,9 +49,21 @@ def main():
     print(intro)
     name = inputName()
     newPlayer = Player(name, config.get("startingMoney"))
+    dealer = Player()
     deck = Deck(config.get("numOfDecks"))
     deck.shuffle()
-    deck.print()
+    
+    while newPlayer.getMoney() and deck.getSize():
+        print("*******NEW ROUND*******")
+        newPlayer.addToHand(deck.drawTwo())
+        dealer.addToHand(deck.drawTwo())
+        newPlayer.printHand()
+        newPlayer.printHandValue()
+        dealer.printDealerHand()
+        break;
+
+          
+         
 
 if __name__ == "__main__": main()
 
