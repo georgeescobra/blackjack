@@ -55,6 +55,18 @@ def inputBet(playerMoney):
         if not valid: print("Please Enter a Valid Amount")
     return float(playerBet)
 
+def inputContinue():
+    playerChoice = ""
+    yValid = False
+    nValid = False
+    while not playerChoice or (not yValid and not nValid) :
+        playerChoice = input("Would You Like to Continue? Yes(Y) or No(N): ")
+        yValid = True if re.search(r"^[yY]\w*", playerChoice) else False
+        nValid = True if re.search(r"^[nN]\w*", playerChoice) else False
+        if not nValid and not yValid: print("Please Enter A Valid Choice Yes or No")
+    return 0 if yValid else 1 
+
+
 def inputHitOrStay():
     playerChoice = ""
     hValid = False
@@ -154,18 +166,19 @@ def main():
                     print("\r\tDealer's Hand Value: ", dealer.getHandValue())
             if playerStatus == status.NOTPLAYING: time.sleep(1)
 
-
         # ending the round/checking who won
         endRoundPayout(newPlayer, amountToBet, playerStatus, multiplier)
         print(newPlayer)
 
         # resets the round
-        print("*******END OF ROUND*******")
-        print()
         newPlayer.clearHand()
         dealer.clearHand()
         playerStatus = status.PLAYING
-
+        print("*******END OF ROUND*******")
+        print()
+        toContinue = inputContinue() # 0 -> continue, 1 -> stop
+        playerStatus = status.PLAYING if toContinue == 0 else status.NOTPLAYING
+        
           
          
 
