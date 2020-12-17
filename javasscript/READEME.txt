@@ -1,0 +1,2 @@
+Solidifying my knowledge of vanilla javascript (web dev)
+This is not going to be the prettiest webpage
